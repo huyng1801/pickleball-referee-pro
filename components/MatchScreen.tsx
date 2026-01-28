@@ -156,14 +156,14 @@ const MatchScreen: React.FC<Props> = ({ settings, state, setState, onExit, onFin
       </div>
 
       <div className="p-5 bg-slate-900/95 backdrop-blur-2xl border-t border-white/10 space-y-4 pb-20 sm:pb-14 shrink-0">
-        <div className="grid grid-cols-4 gap-3">
+        <div className={`grid grid-cols-4 gap-3 ${visualSideSwapped ? 'flex-row-reverse' : ''}`}>
           {/* Nút Đội A: Chỉ cho phép nhấn khi đang giao bóng */}
           <button 
-            onClick={() => onPoint(0)}
-            disabled={servingTeam !== 0}
-            className={`col-span-1 border transition-all py-6 sm:py-8 rounded-2xl flex flex-col items-center justify-center font-bold text-sm ${servingTeam === 0 ? 'bg-blue-600/40 border-blue-500 text-blue-300 active:scale-95' : 'bg-white/5 border-white/5 text-slate-700 opacity-50 pointer-events-none'}`}
+            onClick={() => onPoint(visualSideSwapped ? 1 : 0)}
+            disabled={servingTeam !== (visualSideSwapped ? 1 : 0)}
+            className={`col-span-1 border transition-all py-6 sm:py-8 rounded-2xl flex flex-col items-center justify-center font-bold text-sm ${servingTeam === (visualSideSwapped ? 1 : 0) ? 'bg-blue-600/40 border-blue-500 text-blue-300 active:scale-95' : 'bg-white/5 border-white/5 text-slate-700 opacity-50 pointer-events-none'}`}
           >
-            <span className="uppercase text-[9px] tracking-widest opacity-60 mb-1">Đội A</span>
+            <span className="uppercase text-[9px] tracking-widest opacity-60 mb-1">{settings.teams[visualSideSwapped ? 1 : 0].name}</span>
             <span className="font-black text-xs sm:text-sm">+ ĐIỂM</span>
           </button>
 
@@ -176,11 +176,11 @@ const MatchScreen: React.FC<Props> = ({ settings, state, setState, onExit, onFin
 
           {/* Nút Đội B: Chỉ cho phép nhấn khi đang giao bóng */}
           <button 
-            onClick={() => onPoint(1)}
-            disabled={servingTeam !== 1}
-            className={`col-span-1 border transition-all py-6 sm:py-8 rounded-2xl flex flex-col items-center justify-center font-bold text-sm ${servingTeam === 1 ? 'bg-green-600/40 border-green-500 text-green-300 active:scale-95' : 'bg-white/5 border-white/5 text-slate-700 opacity-50 pointer-events-none'}`}
+            onClick={() => onPoint(visualSideSwapped ? 0 : 1)}
+            disabled={servingTeam !== (visualSideSwapped ? 0 : 1)}
+            className={`col-span-1 border transition-all py-6 sm:py-8 rounded-2xl flex flex-col items-center justify-center font-bold text-sm ${servingTeam === (visualSideSwapped ? 0 : 1) ? 'bg-green-600/40 border-green-500 text-green-300 active:scale-95' : 'bg-white/5 border-white/5 text-slate-700 opacity-50 pointer-events-none'}`}
           >
-            <span className="uppercase text-[9px] tracking-widest opacity-60 mb-1">Đội B</span>
+            <span className="uppercase text-[9px] tracking-widest opacity-60 mb-1">{settings.teams[visualSideSwapped ? 0 : 1].name}</span>
             <span className="font-black text-xs sm:text-sm">+ ĐIỂM</span>
           </button>
         </div>
