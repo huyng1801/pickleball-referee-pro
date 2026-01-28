@@ -13,6 +13,16 @@ interface Props {
 }
 
 const MatchScreen: React.FC<Props> = ({ settings, state, setState, onExit, onFinish }) => {
+  // Save state to localStorage whenever it changes
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('pickleball_current_state', JSON.stringify(state));
+      console.log('Match state saved:', state.scores, 'Serving:', state.servingTeam);
+    } catch (e) {
+      console.error('Failed to save match state:', e);
+    }
+  }, [state]);
+
   const { scores, servingTeam, serverNumber, teamPositions, isGameOver, visualSideSwapped } = state;
 
   const onPoint = (teamIdx: 0 | 1) => {

@@ -11,35 +11,64 @@ const App: React.FC = () => {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [history, setHistory] = useState<CompletedMatch[]>([]);
 
-  // Load history from localStorage on mount
+  // Load history and current match state from localStorage on mount
   useEffect(() => {
-    const savedHistory = localStorage.getItem('pickleball_history');
-    if (savedHistory) {
-      try {
+    try {
+      // Load history
+      const savedHistory = localStorage.getItem('pickleball_history');
+      if (savedHistory) {
         setHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error("Failed to parse history", e);
       }
+
+      // Load current match state if it exists
+      const savedMatchSettings = localStorage.getItem('pickleball_current_settings');
+      const savedMatchState = localStorage.getItem('pickleball_current_state');
+      
+      console.log('Checking saved match data:', { 
+        hasSettings: !!savedMatchSettings, 
+        hasState: !!savedMatchState 
+      });
+
+      if (savedMatchSettings && savedMatchState) {
+        const parsedSettings = JSON.parse(savedMatchSettings);
+        const parsedState = JSON.parse(savedMatchState);
+        
+        console.log('Restoring match state:', { parsedSettings, parsedState });
+        
+        setMatchSettings(parsedSettings);
+        setMatchState(parsedState);
+        setCurrentView('match');
+      }
+    } catch (e) {
+      console.error("Failed to load saved data:", e);
+      // Clear corrupted data
+      localStorage.removeItem('pickleball_current_settings');
+      localStorage.removeItem('pickleball_current_state');
     }
   }, []);
 
   const handleStartMatch = (settings: MatchSettings) => {
     setMatchSettings(settings);
-    setMatchState(createInitialMatchState(settings.initialServerTeam));
+    const initialState = createInitialMatchState(settings.initialServerTeam);
+    setMatchState(initialState);
     setCurrentView('match');
+    // Save match state to localStorage
+    localStorage.setItem('pickleball_current_settings', JSON.stringify(settings));
+    localStorage.setItem('pickleball_current_state', JSON.stringify(initialState));
   };
 
   const handleExitMatch = () => {
     setCurrentView('setup');
     setMatchState(null);
     setMatchSettings(null);
+    // Clear saved match state
+    localStorage.removeItem('pickleball_current_settings');
+    localStorage.removeItem('pickleball_current_state');
   };
 
   const handleClearHistory = () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử đấu?")) {
-      setHistory([]);
-      localStorage.removeItem('pickleball_history');
-    }
+    setHistory([]);
+    localStorage.removeItem('pickleball_history');
   };
 
   const handleFinishMatch = (match: CompletedMatch) => {
@@ -49,6 +78,9 @@ const App: React.FC = () => {
     setCurrentView('setup');
     setMatchState(null);
     setMatchSettings(null);
+    // Clear saved match state when finishing
+    localStorage.removeItem('pickleball_current_settings');
+    localStorage.removeItem('pickleball_current_state');
   };
 
   return (

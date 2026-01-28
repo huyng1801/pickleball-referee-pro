@@ -25,6 +25,7 @@ const SetupScreen: React.FC<Props> = ({ onStart, history, onClearHistory }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   useEffect(() => {
     const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -43,6 +44,11 @@ const SetupScreen: React.FC<Props> = ({ onStart, history, onClearHistory }) => {
     } else {
       setShowInstallGuide(true);
     }
+  };
+
+  const handleConfirmClear = () => {
+    onClearHistory();
+    setShowClearConfirm(false);
   };
 
   const handleStart = () => {
@@ -179,17 +185,55 @@ const SetupScreen: React.FC<Props> = ({ onStart, history, onClearHistory }) => {
 
         {/* History Section */}
         {history.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
+          <div className="space-y-3 relative">
+            <div className="flex items-center justify-between px-1 relative">
               <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <History size={12} /> LỊCH SỬ GẦN ĐÂY
               </h3>
               <button 
-                onClick={onClearHistory}
+                onClick={() => setShowClearConfirm(true)}
                 className="text-[8px] font-black text-red-500/70 hover:text-red-500 active:scale-90 transition-all uppercase tracking-widest flex items-center gap-1.5 bg-red-500/5 px-2.5 py-1 rounded-md border border-red-500/10"
               >
                 <Trash2 size={10} /> XÓA LỊCH SỬ
               </button>
+
+              {/* Clear History Confirmation Popover */}
+              {showClearConfirm && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-[99]"
+                    onClick={() => setShowClearConfirm(false)}
+                  />
+                  <div className="absolute z-[100] bg-slate-900 border border-white/10 rounded-lg shadow-2xl p-3 animate-in zoom-in-95 duration-200 top-full right-0 mt-2 w-72">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="text-[11px] font-black text-white uppercase tracking-tight">XÓA LỊCH SỬ?</h3>
+                        <p className="text-slate-500 text-[9px] font-bold mt-0.5">Không thể hoàn tác</p>
+                      </div>
+                      <button
+                        onClick={() => setShowClearConfirm(false)}
+                        className="text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowClearConfirm(false)}
+                        className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-black py-1.5 rounded-md uppercase tracking-widest text-[8px] transition-colors border border-white/5 active:scale-95"
+                      >
+                        HỦY
+                      </button>
+                      <button
+                        onClick={handleConfirmClear}
+                        className="flex-1 bg-red-600 hover:bg-red-500 text-white font-black py-1.5 rounded-md uppercase tracking-widest text-[8px] transition-colors active:scale-95 shadow-lg"
+                      >
+                        XÓA
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             <div className="space-y-2">
               {history.slice(0, 3).map((match) => (
@@ -270,6 +314,16 @@ const SetupScreen: React.FC<Props> = ({ onStart, history, onClearHistory }) => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Clear History Confirmation Modal */}
+      {showClearConfirm && (
+        <>
+          <div 
+            className="fixed inset-0 z-[99]"
+            onClick={() => setShowClearConfirm(false)}
+          />
+        </>
       )}
     </div>
   );
